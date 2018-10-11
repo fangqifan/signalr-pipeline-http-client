@@ -23,14 +23,14 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git@github.com:fangqifan/signalr-pipeline-http-client.git"
   },
   "author": "fangqifan",
   "license": "Apache-2.0",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/fangqifan/signalr-pipeline-http-client/issues"
   },
-  "homepage": "",
+  "homepage": "https://github.com/fangqifan/signalr-pipeline-http-client",
   "files": [
     "dist/**/*",
     "src/**/*"
