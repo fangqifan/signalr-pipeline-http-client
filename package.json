@@ -1,0 +1,55 @@
+{
+  "name": "signalr-pipeline-http-client",
+  "version": "0.1.0",
+  "description": "Request Middleware Pipeline Http Client for SignalR",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "typings": "./dist/esm/index.d.ts",
+  "umd": "./dist/browser/signalr-pipeline-http-client.js",
+  "umd_name": "signalr-pipeline-http-client",
+  "scripts": {
+    "gen": "npm run gen:request-middleware-pipeline && npm run gen:miniapp-middleware-contracts",
+    "gen:miniapp-middleware-contracts": "dts-gen -m miniapp-middleware-contracts -o -f ./src/dts/miniapp-middleware-contracts.d.ts",
+    "gen:request-middleware-pipeline": "dts-gen -m request-middleware-pipeline -o -f ./src/dts/request-middleware-pipeline.d.ts",
+    "clean": "node ./node_modules/rimraf/bin.js ./dist",
+    "build": "npm run clean && npm run build:lint && npm run build:esm && npm run build:cjs && npm run build:browser && npm run build:uglify",
+    "build:lint": "node ./node_modules/tslint/bin/tslint -c ./tslint.json -p ./tsconfig.json",
+    "build:esm": "node ./node_modules/typescript/bin/tsc --project ./tsconfig.json --module es2015 --outDir ./dist/esm -d && node ./build/process-dts.js",
+    "build:cjs": "node ./node_modules/typescript/bin/tsc --project ./tsconfig.json --module commonjs --outDir ./dist/cjs",
+    "build:browser": "node ./node_modules/webpack-cli/bin/cli.js",
+    "build:uglify": "node ./node_modules/uglify-js/bin/uglifyjs --source-map \"url='signalr-pipeline-http-client.min.js.map',content='./dist/browser/signalr-pipeline-http-client.js.map'\" --comments -o ./dist/browser/signalr-pipeline-http-client.min.js ./dist/browser/signalr-pipeline-http-client.js",
+    "prepack": "node ./build/embed-version.js",
+    "test": "echo \"no test\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "fangqifan",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^10.9.4",
+    "@types/webpack": "^4.4.0",
+    "@aspnet/signalr": "^1.0.4",
+    "es6-promise": "^4.2.2",
+    "request-middleware-pipeline": "^0.1.0",
+    "miniapp-middleware-contracts": "^0.1.1",
+    "rimraf": "^2.6.2",
+    "tern": "^0.22.3",
+    "ts-loader": "^4.5.0",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1",
+    "uglify-js": "^3.3.5",
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.3",
+    "ajv": "^6.0.0"
+  }
+}
