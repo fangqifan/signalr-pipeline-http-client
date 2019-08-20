@@ -2,17 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 import { HttpClient, HttpError, HttpRequest, HttpResponse } from "@aspnet/signalr";
-import { Contracts } from "./dts/miniapp-middleware-contracts";
-import { MiddlewareManager } from "./dts/request-middleware-pipeline";
 
 export class PipelineHttpClient extends HttpClient {
-    private manager: MiddlewareManager;
-    private contracts: Contracts;
+    private requestMethod: (requestObj: any) => Promise<{ statusCode: any, data: any }>;
 
-    public constructor(manager: MiddlewareManager, contracts: Contracts) {
+    public constructor(request: (requestObj: any) => Promise<{ statusCode: any, data: any }>) {
         super();
-        this.manager = manager;
-        this.contracts = contracts;
+        this.requestMethod = request;
     }
 
     /** @inheritDoc */
@@ -30,10 +26,7 @@ export class PipelineHttpClient extends HttpClient {
         }
 
         return new Promise<HttpResponse>((resolve, reject) => {
-            const contextData: any = {};
             const requestObj: any = {};
-
-            contextData[this.contracts.WxRequestOptions] = requestObj;
 
             requestObj.url = request.url;
             requestObj.method = request.method;
@@ -55,13 +48,9 @@ export class PipelineHttpClient extends HttpClient {
                 requestObj.responseType = request.responseType;
             }
 
-            this.manager.request({})
-                .then((data: any) => {
-                    if (data[this.contracts.WxResponse].statusCode >= 200 && data[this.contracts.WxResponse].statusCode < 300) {
-                        resolve(new HttpResponse(data[this.contracts.WxResponse].statusCode, data[this.contracts.WxResponse].statusCode.toString(), data[this.contracts.WxResponseData]));
-                    } else {
-                        reject(new HttpError("request failed.", data[this.contracts.WxResponse].statusCode));
-                    }
+            this.requestMethod(requestObj)
+                .then((result: any) => {
+                    resolve(new HttpResponse(result.statusCode, result.statusCode.toString(), result.data));
                 })
                 .catch(() => {
                     reject(new HttpError("request failed.", 0));

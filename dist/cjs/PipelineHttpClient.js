@@ -15,10 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var signalr_1 = require("@aspnet/signalr");
 var PipelineHttpClient = /** @class */ (function (_super) {
     __extends(PipelineHttpClient, _super);
-    function PipelineHttpClient(manager, contracts) {
+    function PipelineHttpClient(request) {
         var _this = _super.call(this) || this;
-        _this.manager = manager;
-        _this.contracts = contracts;
+        _this.requestMethod = request;
         return _this;
     }
     /** @inheritDoc */
@@ -35,9 +34,7 @@ var PipelineHttpClient = /** @class */ (function (_super) {
             return Promise.reject(new Error("No url defined."));
         }
         return new Promise(function (resolve, reject) {
-            var contextData = {};
             var requestObj = {};
-            contextData[_this.contracts.WxRequestOptions] = requestObj;
             requestObj.url = request.url;
             requestObj.method = request.method;
             requestObj.dataType = "text";
@@ -55,14 +52,9 @@ var PipelineHttpClient = /** @class */ (function (_super) {
             if (request.responseType) {
                 requestObj.responseType = request.responseType;
             }
-            _this.manager.request({})
-                .then(function (data) {
-                if (data[_this.contracts.WxResponse].statusCode >= 200 && data[_this.contracts.WxResponse].statusCode < 300) {
-                    resolve(new signalr_1.HttpResponse(data[_this.contracts.WxResponse].statusCode, data[_this.contracts.WxResponse].statusCode.toString(), data[_this.contracts.WxResponseData]));
-                }
-                else {
-                    reject(new signalr_1.HttpError("request failed.", data[_this.contracts.WxResponse].statusCode));
-                }
+            _this.requestMethod(requestObj)
+                .then(function (result) {
+                resolve(new signalr_1.HttpResponse(result.statusCode, result.statusCode.toString(), result.data));
             })
                 .catch(function () {
                 reject(new signalr_1.HttpError("request failed.", 0));
